@@ -1,0 +1,70 @@
+# Example configuration file for secscan_react
+# Copy this file to config.yaml and customize as needed
+
+# LLM Configuration
+model: "qwen/qwen3-coder-30b"  # Model name in LM Studio
+lm_studio_url: "http://localhost:1234"  # LM Studio endpoint
+temperature: 0.0  # Lower = more consistent, Higher = more creative
+max_tokens: 4096  # Maximum tokens for LLM response
+
+# Output Configuration
+output_format: "console"  # Options: console, json, markdown, sarif
+output_file: null  # Path to save report file (optional)
+severity_filter: "info"  # Minimum severity: critical, high, medium, low, info
+
+# React-Specific Settings
+react_version: 18  # Target React version (17, 18, 19)
+check_hooks: true  # Enable React Hooks security analysis
+check_performance: false  # Include performance-related security issues
+framework: "react"  # Options: react, next, remix, gatsby
+include_dependencies: false  # Analyze imported dependencies
+
+# Analysis Configuration
+chunk_size: 5000  # Lines per chunk for large files
+enable_chunking: true  # Enable automatic chunking for large files
+retry_attempts: 3  # Number of retry attempts on failure
+retry_delay: 2  # Delay between retries (seconds)
+timeout: 300  # Request timeout (seconds)
+
+# Logging
+verbose: false  # Enable verbose logging
+
+# Custom Security Rules (Optional)
+# Define custom patterns or rules for React security analysis
+custom_rules:
+  # Dangerous functions to flag
+  dangerous_functions:
+    - "dangerouslySetInnerHTML"
+    - "eval"
+    - "Function"
+    - "innerHTML"
+    - "outerHTML"
+    - "document.write"
+
+  # Sensitive data patterns in storage
+  sensitive_storage_keys:
+    - "token"
+    - "password"
+    - "secret"
+    - "apikey"
+    - "credential"
+    - "session"
+    - "auth"
+
+  # Unsafe React attributes
+  unsafe_attributes:
+    - "dangerouslySetInnerHTML"
+    - "srcDoc"
+
+  # Framework-specific rules
+  framework_specific:
+    next:
+      - "getServerSideProps without validation"
+      - "API routes without authentication"
+      - "Unvalidated server actions"
+    remix:
+      - "loader without authentication"
+      - "action without CSRF protection"
+    gatsby:
+      - "Exposed environment variables"
+      - "GraphQL injection risks"

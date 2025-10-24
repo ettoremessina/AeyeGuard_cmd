@@ -1,0 +1,39 @@
+# Example configuration file for secscan_cs
+# Copy this file to config.yaml and customize as needed
+
+# LLM Configuration
+model: "qwen/qwen3-coder-30b"  # Model name in LM Studio
+lm_studio_url: "http://localhost:1234"  # LM Studio endpoint
+temperature: 0.2  # Lower = more consistent, Higher = more creative
+max_tokens: 4096  # Maximum tokens for LLM response
+
+# Output Configuration
+output_format: "console"  # Options: console, json, markdown, sarif
+output_file: null  # Path to save report file (optional)
+severity_filter: "info"  # Minimum severity: critical, high, medium, low, info
+
+# Analysis Configuration
+chunk_size: 5000  # Lines per chunk for large files
+enable_chunking: true  # Enable automatic chunking for large files
+retry_attempts: 3  # Number of retry attempts on failure
+retry_delay: 2  # Delay between retries (seconds)
+timeout: 300  # Request timeout (seconds)
+
+# Logging
+verbose: false  # Enable verbose logging
+
+# Custom Security Rules (Optional)
+# Define custom patterns or rules for security analysis
+custom_rules:
+  # Example: Flag specific dangerous functions
+  dangerous_functions:
+    - "System.Diagnostics.Process.Start"
+    - "System.Reflection.Assembly.Load"
+    - "eval"
+
+  # Example: Sensitive data patterns
+  sensitive_patterns:
+    - "password"
+    - "apikey"
+    - "secret"
+    - "token"

@@ -1,0 +1,21 @@
+# Requirements for AeyeGuard - Security Static Analysis Toolkit
+# This includes dependencies for all analyzers (AeyeGuard_cmd.py, AeyeGuard_cs.py, AeyeGuard_react.py)
+
+# LangChain and LLM integration
+langchain>=0.1.0
+langchain-community>=0.0.20
+
+# HTTP requests for LM Studio API
+requests>=2.31.0
+
+# Configuration file support
+pyyaml>=6.0
+
+# Environment variables
+python-dotenv>=1.0.0
+
+# Optional: Enhanced logging
+colorlog>=6.7.0
+
+# Optional: JavaScript/TypeScript parsing (for React analyzer advanced features)
+# esprima>=4.0.1
