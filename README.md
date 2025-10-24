@@ -218,7 +218,7 @@ This uses a different model and LM Studio instance with custom parameters.
 
 **Solutions:**
 1. Verify the directory path is correct
-2. Check that C# files (`.cs`) exist in the directory
+2. Check that supported files exist in the directory (`.cs`, `.java`, `.tsx`, `.jsx`)
 3. Review exclude patterns - you may be excluding too much
 4. Use `--verbose` to see which files are being excluded
 
@@ -256,24 +256,32 @@ This uses a different model and LM Studio instance with custom parameters.
 ```
 AeyeGuard_cmd.py (Recursive Scanner)
     |
-    +-- Discovers .cs files recursively
+    +-- Discovers source files recursively (.cs, .java, .tsx, .jsx)
     |
     +-- For each file:
         |
-        +-- Calls cs/AeyeGuard_cs.py
+        +-- Calls appropriate analyzer:
             |
-            +-- Reads C# file
-            +-- Connects to LM Studio
-            +-- Performs security analysis
-            +-- Returns JSON results
+            +-- cs/AeyeGuard_cs.py (for .cs files)
+            +-- java/AeyeGuard_java.py (for .java files)
+            +-- react/AeyeGuard_react.py (for .tsx, .jsx files)
+                |
+                +-- Reads source file
+                +-- Connects to LM Studio
+                +-- Performs security analysis
+                +-- Returns analysis results
     |
     +-- Aggregates all results
     +-- Formats output (console/json/markdown/sarif)
 ```
 
-## Implementation guidelines
+## Requirements
 
-See [docs/AeyeGuard_specifications.md](docs/AeyeGuard_specifications.md) for detailed requirements and implementation guidelines.
+See the following specifications for detailed requirements and implementation guidelines:
+- [docs/AeyeGuard_specifications.md](docs/AeyeGuard_specifications.md) - Main orchestrator specifications
+- [docs/AeyeGuard_cs_specifications.md](docs/AeyeGuard_cs_specifications.md) - C# analyzer specifications
+- [docs/AeyeGuard_java_specifications.md](docs/AeyeGuard_java_specifications.md) - Java analyzer specifications
+- [docs/AeyeGuard_react_specifications.md](docs/AeyeGuard_react_specifications.md) - React/TypeScript analyzer specifications
 
 ## License
 
