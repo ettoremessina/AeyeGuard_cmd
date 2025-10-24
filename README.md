@@ -1,27 +1,23 @@
-# Security Static Analysis Tools
+# AeyeGuard_cmd: a Security Static Analysis Tool
 
-This repository contains security static analysis tools that leverage local LLM capabilities to perform comprehensive security vulnerability detection in source code.
+This repository contains security static analysis command line tool that leverages local LLM capabilities to perform comprehensive security vulnerability detection in source code.
 
-## Tools
-
-### AeyeGuard_cmd.py - Recursive Security Scanner
+## AeyeGuard_cmd.py - Recursive Security Scanner
 
 A wrapper tool that recursively scans directories for source code files and delegates security analysis to language-specific analyzers.
 
 **Current Support:**
 - C# files (`.cs`) via `cs/AeyeGuard_cs.py`
-- React/TypeScript files (`.tsx`, `.jsx`) via `tsx/AeyeGuard_react.py`
-
-**Planned Support:**
-- Python, Java, Go, and other languages
+- Java files (`.java`) via `java/AeyeGuard_java.py`
+- React/TypeScript files (`.tsx`, `.jsx`) via `react/AeyeGuard_react.py`
 
 ### Language-Specific Analyzers
 
 #### cs/AeyeGuard_cs.py - C# Security Analyzer
 Analyzes C# source code files for .NET security vulnerabilities including SQL injection, authentication issues, cryptography weaknesses, and .NET-specific security patterns.
 
-#### tsx/AeyeGuard_react.py - React/TypeScript Security Analyzer
-Analyzes React/TypeScript files for frontend security issues including XSS, dangerouslySetInnerHTML, authentication bypass, state management security, and React Hooks vulnerabilities.
+#### react/AeyeGuard_react.py - React/TypeScript and React/Javascript Security Analyzer
+Analyzes React/TypeScript and React/Javascript files for frontend security issues including XSS, dangerouslySetInnerHTML, authentication bypass, state management security, and React Hooks vulnerabilities.
 
 ## Quick Start
 
@@ -38,7 +34,8 @@ Analyzes React/TypeScript files for frontend security issues including XSS, dang
 # Clone or download this repository
 cd /path/to/analyzer
 
-# No additional dependencies needed - uses Python standard library
+# Install dependencies
+pip install -r requirements.txt
 ```
 
 ### Basic Usage
@@ -287,8 +284,8 @@ See [docs/AeyeGuard_specifications.md](docs/AeyeGuard_specifications.md) for det
 
 ## License
 
-(Add your license here)
+[MIT License](https://github.com/ettoremessina/AeyeGuard_cmd?tab=MIT-1-ov-file#)
 
-## Support
+## Info
 
-For issues, questions, or contributions, please refer to the project documentation.
+For issues, questions, or contributions, please refer to the project information on [AeyeGuard: a reliable and capable static code analyzer command line powered by a local LLM](https://ettoremessina.tech/agentic-applications/aeyeguard-a-reliable-and-capable-static-code-analyzer-command-line-powered-by-a-local-llm/) post on my website [https://ettoremessina.tech/](https://ettoremessina.tech/).
