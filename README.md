@@ -249,7 +249,6 @@ This uses a different model and LM Studio instance with custom parameters.
 **Solutions:**
 1. Reduce `--parallel` value (use 1 or 2)
 2. Use `--max-files` to limit scope
-3. Scan subdirectories separately
 
 ## Architecture
 
