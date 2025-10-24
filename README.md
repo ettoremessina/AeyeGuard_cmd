@@ -9,12 +9,15 @@ A wrapper tool that recursively scans directories for source code files and dele
 **Current Support:**
 - C# files (`.cs`) via `cs/AeyeGuard_cs.py`
 - Java files (`.java`) via `java/AeyeGuard_java.py`
-- React/TypeScript files (`.tsx`, `.jsx`) via `react/AeyeGuard_react.py`
+- React/TypeScript and React/JavsScript files (`.tsx`, `.jsx`) via `react/AeyeGuard_react.py`
 
 ### Language-Specific Analyzers
 
 #### cs/AeyeGuard_cs.py - C# Security Analyzer
 Analyzes C# source code files for .NET security vulnerabilities including SQL injection, authentication issues, cryptography weaknesses, and .NET-specific security patterns.
+
+#### java/AeyeGuard_java.py - Java Security Analyzer
+Analyzes Java source code files for security vulnerabilities including SQL injection, insecure deserialization, authentication issues, cryptography weaknesses, and Java-specific security patterns.
 
 #### react/AeyeGuard_react.py - React/TypeScript and React/Javascript Security Analyzer
 Analyzes React/TypeScript and React/Javascript files for frontend security issues including XSS, dangerouslySetInnerHTML, authentication bypass, state management security, and React Hooks vulnerabilities.
@@ -268,17 +271,7 @@ AeyeGuard_cmd.py (Recursive Scanner)
     +-- Formats output (console/json/markdown/sarif)
 ```
 
-## Future Enhancements
-
-- **Additional Languages:** Python, Java, JavaScript, Go, etc.
-- **Baseline Comparison:** Compare with previous scan results
-- **Incremental Scanning:** Scan only changed files
-- **CI/CD Integration:** GitHub Actions, GitLab CI, Jenkins
-- **Custom Rules:** User-defined security patterns
-- **SARIF Support:** Full SARIF 2.1.0 output format
-- **HTML Reports:** Interactive web-based reports
-
-## Contributing
+## Implementation guidelines
 
 See [docs/AeyeGuard_specifications.md](docs/AeyeGuard_specifications.md) for detailed requirements and implementation guidelines.
 
