@@ -284,7 +284,7 @@ See the following specifications for detailed requirements and implementation gu
 
 ## License
 
-[MIT License](https://github.com/ettoremessina/AeyeGuard_cmd?tab=MIT-1-ov-file#)
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
 ## Info
 
