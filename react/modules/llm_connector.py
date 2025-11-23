@@ -56,12 +56,11 @@ class LLMConnector:
 
                 if models:
                     available_models = [m.get('id') for m in models]
-                    logger.info(f"Connected to LM Studio. Available models: {available_models}")
+                    logger.info("Connected to LM Studio")
 
                     # Check if requested model is available
                     if self.model_name not in available_models:
                         logger.warning(f"Requested model '{self.model_name}' not found in available models")
-                        logger.warning(f"Available models: {available_models}")
                         logger.warning("Proceeding anyway - LM Studio may map the request to loaded model")
 
                     return True
