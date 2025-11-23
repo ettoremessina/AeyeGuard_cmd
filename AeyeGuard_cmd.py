@@ -56,7 +56,7 @@ def setup_logging(verbose: bool = False) -> None:
         level=log_level,
         format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
         handlers=[
-            logging.StreamHandler(sys.stdout)
+            logging.StreamHandler(sys.stderr)  # Use stderr to avoid mixing with stdout output
         ]
     )
 
