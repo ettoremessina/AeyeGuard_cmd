@@ -481,6 +481,482 @@ def format_output(results, scan_start_time, scan_end_time, input_dir, config_inf
     return "\n".join(lines)
 
 
+def format_output_html(results, scan_start_time, scan_end_time, input_dir, config_info):
+    """
+    Format analysis results as HTML with nice styling.
+
+    Args:
+        results: List of tuples (file_path, status, duration, output, stderr, returncode)
+        scan_start_time: Start time of scan
+        scan_end_time: End time of scan
+        input_dir: Input directory path
+        config_info: Configuration information
+
+    Returns:
+        Formatted HTML string
+    """
+    scan_duration = (scan_end_time - scan_start_time).total_seconds()
+
+    # Count successful and failed analyses
+    successful = sum(1 for r in results if r[1] == 'success')
+    failed = sum(1 for r in results if r[1] != 'success')
+
+    # Count by exit code for successful ones
+    critical_findings = sum(1 for r in results if r[1] == 'success' and r[5] == 2)
+    high_findings = sum(1 for r in results if r[1] == 'success' and r[5] == 1)
+    clean_files = sum(1 for r in results if r[1] == 'success' and r[5] == 0)
+
+    # HTML template with embedded CSS
+    html = f"""<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Security Scan Results - {scan_end_time.strftime('%Y-%m-%d %H:%M:%S')}</title>
+    <style>
+        * {{
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }}
+
+        body {{
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: #f5f5f5;
+            padding: 20px;
+        }}
+
+        .container {{
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            padding: 40px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }}
+
+        h1 {{
+            color: #2c3e50;
+            border-bottom: 3px solid #3498db;
+            padding-bottom: 15px;
+            margin-bottom: 30px;
+            font-size: 2.5em;
+        }}
+
+        h2 {{
+            color: #34495e;
+            margin-top: 40px;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #ecf0f1;
+            font-size: 1.8em;
+        }}
+
+        h3 {{
+            color: #7f8c8d;
+            margin-top: 25px;
+            margin-bottom: 15px;
+            font-size: 1.3em;
+        }}
+
+        .meta-info {{
+            background: #ecf0f1;
+            padding: 20px;
+            border-radius: 5px;
+            margin-bottom: 30px;
+        }}
+
+        .meta-info p {{
+            margin: 8px 0;
+            font-size: 1.05em;
+        }}
+
+        .meta-info strong {{
+            color: #2c3e50;
+            min-width: 150px;
+            display: inline-block;
+        }}
+
+        .summary-grid {{
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin: 30px 0;
+        }}
+
+        .summary-card {{
+            background: #fff;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+            transition: transform 0.2s;
+        }}
+
+        .summary-card:hover {{
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }}
+
+        .summary-card.critical {{
+            border-color: #e74c3c;
+            background: #fee;
+        }}
+
+        .summary-card.high {{
+            border-color: #e67e22;
+            background: #ffeaa7;
+        }}
+
+        .summary-card.clean {{
+            border-color: #27ae60;
+            background: #d5f5e3;
+        }}
+
+        .summary-card.failed {{
+            border-color: #95a5a6;
+            background: #ecf0f1;
+        }}
+
+        .summary-card .number {{
+            font-size: 3em;
+            font-weight: bold;
+            margin: 10px 0;
+        }}
+
+        .summary-card.critical .number {{
+            color: #c0392b;
+        }}
+
+        .summary-card.high .number {{
+            color: #d35400;
+        }}
+
+        .summary-card.clean .number {{
+            color: #229954;
+        }}
+
+        .summary-card.failed .number {{
+            color: #7f8c8d;
+        }}
+
+        .summary-card .label {{
+            font-size: 1.1em;
+            color: #555;
+            font-weight: 600;
+        }}
+
+        .file-list {{
+            background: #fafafa;
+            border-left: 4px solid #3498db;
+            padding: 15px 20px;
+            margin: 15px 0;
+            border-radius: 4px;
+        }}
+
+        .file-list.critical {{
+            border-left-color: #e74c3c;
+            background: #fee;
+        }}
+
+        .file-list.high {{
+            border-left-color: #e67e22;
+            background: #ffeaa7;
+        }}
+
+        .file-list.failed {{
+            border-left-color: #95a5a6;
+            background: #ecf0f1;
+        }}
+
+        .file-list ul {{
+            list-style: none;
+            padding-left: 0;
+        }}
+
+        .file-list li {{
+            padding: 8px 0;
+            font-family: 'Courier New', monospace;
+            font-size: 0.95em;
+            color: #555;
+        }}
+
+        .file-details {{
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 5px;
+            margin: 20px 0;
+            overflow: hidden;
+        }}
+
+        .file-header {{
+            background: #343a40;
+            color: white;
+            padding: 15px 20px;
+            font-family: 'Courier New', monospace;
+        }}
+
+        .file-header .filename {{
+            font-size: 1.2em;
+            font-weight: bold;
+            word-break: break-all;
+        }}
+
+        .file-meta {{
+            display: flex;
+            gap: 20px;
+            margin-top: 8px;
+            font-size: 0.9em;
+            color: #adb5bd;
+        }}
+
+        .file-meta span {{
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }}
+
+        .status-badge {{
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 0.85em;
+            font-weight: bold;
+            text-transform: uppercase;
+        }}
+
+        .status-badge.success {{
+            background: #27ae60;
+            color: white;
+        }}
+
+        .status-badge.error {{
+            background: #e74c3c;
+            color: white;
+        }}
+
+        .exit-code {{
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-weight: bold;
+        }}
+
+        .exit-code.code-0 {{
+            background: #d5f5e3;
+            color: #229954;
+        }}
+
+        .exit-code.code-1 {{
+            background: #ffeaa7;
+            color: #d35400;
+        }}
+
+        .exit-code.code-2 {{
+            background: #fee;
+            color: #c0392b;
+        }}
+
+        .file-content {{
+            padding: 20px;
+            max-height: 600px;
+            overflow-y: auto;
+        }}
+
+        .file-content pre {{
+            background: #2c3e50;
+            color: #ecf0f1;
+            padding: 20px;
+            border-radius: 5px;
+            overflow-x: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            line-height: 1.5;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }}
+
+        .config-section {{
+            background: #e8f4f8;
+            border-left: 4px solid #3498db;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 4px;
+        }}
+
+        .config-section ul {{
+            list-style: none;
+            padding-left: 0;
+        }}
+
+        .config-section li {{
+            padding: 5px 0;
+            font-family: 'Courier New', monospace;
+        }}
+
+        .config-section strong {{
+            color: #2c3e50;
+            min-width: 180px;
+            display: inline-block;
+        }}
+
+        .no-findings {{
+            text-align: center;
+            padding: 40px;
+            color: #7f8c8d;
+            font-style: italic;
+        }}
+
+        @media print {{
+            body {{
+                background: white;
+                padding: 0;
+            }}
+
+            .container {{
+                box-shadow: none;
+                padding: 20px;
+            }}
+
+            .file-content {{
+                max-height: none;
+            }}
+        }}
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🛡️ Security Scan Results</h1>
+
+        <div class="meta-info">
+            <p><strong>Scan Completed:</strong> {scan_end_time.strftime('%Y-%m-%d %H:%M:%S')}</p>
+            <p><strong>Duration:</strong> {scan_duration:.2f} seconds</p>
+            <p><strong>Directory:</strong> {input_dir}</p>
+            <p><strong>Files Scanned:</strong> {len(results)}</p>
+        </div>
+
+        <h2>📊 Analysis Summary</h2>
+
+        <div class="summary-grid">
+            <div class="summary-card critical">
+                <div class="number">{critical_findings}</div>
+                <div class="label">Critical Findings</div>
+            </div>
+            <div class="summary-card high">
+                <div class="number">{high_findings}</div>
+                <div class="label">High Severity</div>
+            </div>
+            <div class="summary-card clean">
+                <div class="number">{clean_files}</div>
+                <div class="label">Clean Files</div>
+            </div>
+            <div class="summary-card failed">
+                <div class="number">{failed}</div>
+                <div class="label">Failed Analyses</div>
+            </div>
+        </div>
+
+        <div class="config-section">
+            <h3>⚙️ Configuration</h3>
+            <ul>
+                <li><strong>Model:</strong> {config_info.get('model', 'N/A')}</li>
+                <li><strong>LM Studio URL:</strong> {config_info.get('lm_studio_url', 'N/A')}</li>
+                <li><strong>Temperature:</strong> {config_info.get('temperature', 'N/A')}</li>
+                <li><strong>Max Tokens:</strong> {config_info.get('max_tokens', 'N/A')}</li>
+                <li><strong>Severity Filter:</strong> {config_info.get('severity_filter', 'N/A')}</li>
+                <li><strong>Parallel Workers:</strong> {config_info.get('parallel_workers', 'N/A')}</li>
+            </ul>
+        </div>
+"""
+
+    # Files with critical findings
+    if critical_findings > 0:
+        html += """
+        <h2>🚨 Files with Critical Findings</h2>
+        <div class="file-list critical">
+            <ul>
+"""
+        for file_path, status, duration, output, stderr, returncode in results:
+            if status == 'success' and returncode == 2:
+                html += f"                <li>{file_path}</li>\n"
+        html += """            </ul>
+        </div>
+"""
+
+    # Files with high findings
+    if high_findings > 0:
+        html += """
+        <h2>⚠️ Files with High Severity Findings</h2>
+        <div class="file-list high">
+            <ul>
+"""
+        for file_path, status, duration, output, stderr, returncode in results:
+            if status == 'success' and returncode == 1:
+                html += f"                <li>{file_path}</li>\n"
+        html += """            </ul>
+        </div>
+"""
+
+    # Failed analyses
+    if failed > 0:
+        html += """
+        <h2>❌ Failed Analyses</h2>
+        <div class="file-list failed">
+            <ul>
+"""
+        for file_path, status, duration, output, stderr, returncode in results:
+            if status != 'success':
+                error_msg = stderr[:200] if stderr else 'No error message'
+                html += f"                <li>{file_path}<br><small style='color:#e74c3c'>Error: {error_msg}</small></li>\n"
+        html += """            </ul>
+        </div>
+"""
+
+    # Detailed output
+    html += """
+        <h2>📄 Detailed Analysis Output</h2>
+"""
+
+    for file_path, status, duration, output, stderr, returncode in results:
+        status_class = 'success' if status == 'success' else 'error'
+        exit_code_class = f'code-{returncode}' if returncode in [0, 1, 2] else 'code-other'
+
+        html += f"""
+        <div class="file-details">
+            <div class="file-header">
+                <div class="filename">{file_path}</div>
+                <div class="file-meta">
+                    <span><span class="status-badge {status_class}">{status}</span></span>
+                    <span>Duration: {duration:.2f}s</span>
+                    <span>Exit Code: <span class="exit-code {exit_code_class}">{returncode}</span></span>
+                </div>
+            </div>
+            <div class="file-content">
+"""
+
+        if output:
+            # Escape HTML in output
+            escaped_output = output.replace('&', '&amp;').replace('<', '&lt;').replace('>', '&gt;')
+            html += f"                <pre>{escaped_output}</pre>\n"
+        elif stderr:
+            escaped_stderr = stderr.replace('&', '&amp;').replace('<', '&lt;').replace('>', '&gt;')
+            html += f"                <pre>STDERR:\n{escaped_stderr}</pre>\n"
+        else:
+            html += "                <p class='no-findings'>No output</p>\n"
+
+        html += """            </div>
+        </div>
+"""
+
+    html += """
+    </div>
+</body>
+</html>
+"""
+
+    return html
 
 
 def parse_arguments() -> argparse.Namespace:
@@ -492,6 +968,7 @@ def parse_arguments() -> argparse.Namespace:
 Examples:
   %(prog)s /path/to/codebase
   %(prog)s /path/to/codebase --output-file report.txt
+  %(prog)s /path/to/codebase --output-file report.html --output-format html
   %(prog)s /path/to/codebase --severity high --exclude "*/obj/*" --exclude "*/bin/*"
   %(prog)s /path/to/codebase --parallel 4 --verbose
         """
@@ -545,7 +1022,14 @@ Examples:
     # AeyeGuard_cmd.py specific options
     parser.add_argument(
         '--output-file',
-        help='Path to save the aggregated report (text format)'
+        help='Path to save the aggregated report'
+    )
+
+    parser.add_argument(
+        '--output-format',
+        choices=['text', 'html'],
+        default='text',
+        help='Output format for the report (default: text)'
     )
 
     parser.add_argument(
@@ -727,14 +1211,24 @@ def main() -> int:
             'exclude_patterns': args.exclude
         }
 
-        formatted_output = format_output(
-            results,
-            scan_start_time,
-            scan_end_time,
-            str(input_dir),
-            config_info,
-            'text'
-        )
+        # Format output based on requested format
+        if args.output_format == 'html':
+            formatted_output = format_output_html(
+                results,
+                scan_start_time,
+                scan_end_time,
+                str(input_dir),
+                config_info
+            )
+        else:
+            formatted_output = format_output(
+                results,
+                scan_start_time,
+                scan_end_time,
+                str(input_dir),
+                config_info,
+                'text'
+            )
 
         # Save or display output
         if args.output_file:
