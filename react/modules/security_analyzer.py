@@ -415,12 +415,15 @@ Please provide your analysis now."""
         has_vulnerabilities = False
 
         # Check for "no vulnerabilities" or similar phrases
+        # Note: Patterns use [\s*_]* to handle markdown formatting like **bold**, *italic*, __underline__
         no_vuln_patterns = [
-            r'no\s+(?:security\s+)?(?:vulnerabilities|issues|problems|findings)\s+(?:found|detected|identified)',
+            r'no\s+(?:security\s+)?(?:vulnerabilities|issues|problems|findings)\s+(?:(?:were|was|have been|are)\s+)?(?:found|detected|identified)',
             r'(?:does not|doesn\'t)\s+(?:contain|have)\s+(?:any\s+)?(?:security\s+)?(?:vulnerabilities|issues)',
             r'(?:appears?|seems?)\s+(?:to be\s+)?(?:secure|safe)',
             r'clean\s+(?:from\s+)?(?:security\s+)?(?:vulnerabilities|issues)',
-            r'no\s+(?:obvious|apparent|significant)\s+(?:security\s+)?(?:vulnerabilities|issues)'
+            r'no\s+(?:obvious|apparent|significant)\s+(?:security\s+)?(?:vulnerabilities|issues)',
+            r'no\s+(?:security\s+)?(?:vulnerability|vulnerabilities|issues?|problems?|findings?)\s+(?:(?:were|was|have been|are)\s+)?(?:reported|found|detected|identified)',
+            r'(?:found|detected|identified)[\s*_]+no[\s*_]+(?:security[\s*_]+)?(?:vulnerability|vulnerabilities|issues?|problems?|findings?)'
         ]
 
         # Check if no vulnerabilities were found
